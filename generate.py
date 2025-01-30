@@ -23,6 +23,8 @@ parser.add_argument('--oneline', action='store_true', default=False,
                     help='generate one line of text (break at newline char)')
 parser.add_argument('--seed', type=int, default=1111,
                     help='random seed')
+parser.add_argument('--prompt', type=str, default='',
+                    help='input prompt')
 parser.add_argument('--cuda', action='store_true',
                     help='use CUDA')
 parser.add_argument('--mps', action='store_true', default=False,
@@ -63,7 +65,18 @@ ntokens = corpus.tokenizer.max_token_value + 1
 is_transformer_model = hasattr(model, 'model_type') and model.model_type == 'Transformer'
 if not is_transformer_model:
     hidden = model.init_hidden(1)
-input = torch.randint(ntokens, (1, 1), dtype=torch.long).to(device)
+    if args.prompt:
+        for token in corpus.tokenizer.encode(args.prompt):
+            input = torch.tensor([[token]], dtype=torch.long).to(device)
+            # update hidden while ignoring output
+            _, hidden = model(input, hidden)
+# TODO: input prompts for transformers
+
+if args.prompt:
+    input = torch.tensor([[corpus.tokenizer.encode('\n')[0]]],
+                         dtype=torch.long).to(device)
+else:
+    input = torch.randint(ntokens, (1, 1), dtype=torch.long).to(device)
 
 with open(args.outf, 'w') as outf:
     with torch.no_grad():  # no tracking history
