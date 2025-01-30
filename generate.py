@@ -19,6 +19,8 @@ parser.add_argument('--outf', type=str, default='generated.txt',
                     help='output file for generated text')
 parser.add_argument('--words', type=int, default='1000',
                     help='number of words to generate')
+parser.add_argument('--oneline', action='store_true', default=False,
+                    help='generate one line of text (break at newline char)')
 parser.add_argument('--seed', type=int, default=1111,
                     help='random seed')
 parser.add_argument('--cuda', action='store_true',
@@ -81,6 +83,7 @@ with open(args.outf, 'w') as outf:
             word = corpus.tokenizer.decode([word_idx])
 
             outf.write(word)
+            if args.oneline and word.endswith('\n'): break
 
             if i % args.log_interval == 0:
                 print('| Generated {}/{} words'.format(i, args.words))
