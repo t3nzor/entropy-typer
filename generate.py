@@ -56,7 +56,7 @@ with open(args.checkpoint, 'rb') as f:
 model.eval()
 
 corpus = data.Corpus(args.data)
-ntokens = len(corpus.dictionary)
+ntokens = corpus.tokenizer.max_token_value + 1
 
 is_transformer_model = hasattr(model, 'model_type') and model.model_type == 'Transformer'
 if not is_transformer_model:
@@ -78,9 +78,9 @@ with open(args.outf, 'w') as outf:
                 word_idx = torch.multinomial(word_weights, 1)[0]
                 input.fill_(word_idx)
 
-            word = corpus.dictionary.idx2word[word_idx]
+            word = corpus.tokenizer.decode([word_idx])
 
-            outf.write(word + ('\n' if i % 20 == 19 else ' '))
+            outf.write(word)
 
             if i % args.log_interval == 0:
                 print('| Generated {}/{} words'.format(i, args.words))
