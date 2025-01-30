@@ -1,4 +1,5 @@
-Forked from https://github.com/pytorch/examples
+Forked from https://github.com/pytorch/examples/tree/main/word_language_model
+
 Original readme below:
 
 # Word-level Language Modeling using RNN and Transformer
