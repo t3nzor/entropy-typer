@@ -66,14 +66,15 @@ is_transformer_model = hasattr(model, 'model_type') and model.model_type == 'Tra
 if not is_transformer_model:
     hidden = model.init_hidden(1)
     if args.prompt:
-        for token in corpus.tokenizer.encode(args.prompt):
+        tokens = corpus.tokenizer.encode(args.prompt)
+        for token in tokens[:-1]:
             input = torch.tensor([[token]], dtype=torch.long).to(device)
             # update hidden while ignoring output
             _, hidden = model(input, hidden)
 # TODO: input prompts for transformers
 
 if args.prompt:
-    input = torch.tensor([[corpus.tokenizer.encode('\n')[0]]],
+    input = torch.tensor([[corpus.tokenizer.encode(tokens[-1])[0]]],
                          dtype=torch.long).to(device)
 else:
     input = torch.randint(ntokens, (1, 1), dtype=torch.long).to(device)
